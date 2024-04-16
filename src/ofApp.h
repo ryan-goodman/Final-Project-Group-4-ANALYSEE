@@ -27,6 +27,7 @@ class ofApp : public ofBaseApp{
 		ofTrueTypeFont prompt;
 		ofRectangle nameRect;
 		ofRectangle promptRect;
+		int promptCounter = 0;
 		int state = 0;
 		int fade = 0;
 };
