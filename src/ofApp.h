@@ -36,6 +36,7 @@ class ofApp : public ofBaseApp{
 		int promptCounter = 0;
 		int state = 0;
 		int fade = 0;
+		int step = 0;
 
 		void drawState0()
 		{
@@ -123,6 +124,24 @@ class ofApp : public ofBaseApp{
 			passOfQuickSort();
 		}
 
+		void drawState9()
+		{
+			ofSetColor(0);
+			otherPrompt.drawString("Merge Sort", ofGetWidth() * 0.75 - otherPromptRect.width / 2, 540);
+			ofSetColor(255);
+			prompt.drawString("Quick Sort", ofGetWidth() * 0.25 - promptRect.width / 2, 540);
+		}
+
+		void drawState11()
+		{
+			ofSetColor(255);
+			for (int i = 0; i < 1920; i++)
+			{
+				ofDrawLine(i, 1080, i, 1080 - nums[i]);
+			}
+			passOfMergeSort();
+		}
+
 		void prepareState2()
 		{
 			ofBackground(40);
@@ -161,26 +180,18 @@ class ofApp : public ofBaseApp{
 			stack.push(1919);
 		}
 
-		int partition(float arr[], int low, int high)
+		void prepareState10()
 		{
-			float pivot = arr[high];
-			int i = low - 1;
-			for (int j = low; j < high; j++)
-			{
-				if (arr[j] <= pivot)
-				{
-					i++;
-					ofSetColor(255, 0, 0);
-					ofDrawLine(i, 1080, i, 1080 - arr[i]);
-					ofDrawLine(j, 1080, j, 1080 - arr[j]);
-					std::swap(arr[i], arr[j]);
-				}
-			}
-			ofSetColor(255, 0, 0);
-			ofDrawLine(i + 1, 1080, i + 1, 1080 - arr[i + 1]);
-			ofDrawLine(high, 1080, high, 1080 - arr[high]);
-			std::swap(arr[i + 1], arr[high]);
-			return i + 1;
+			otherPrompt.loadFont("fonts/Kanit/Kanit-Light.ttf", 40);
+			otherPromptRect = otherPrompt.getStringBoundingBox("Merge Sort", 0, 0);
+		}
+		void prepareState11()
+		{
+			ofSetColor(255);
+			std::random_device random;
+			std::mt19937 g(random());
+			std::shuffle(nums, nums + 1920, random);
+			step = 1;
 		}
 
 		void passOfQuickSort()
@@ -191,7 +202,7 @@ class ofApp : public ofBaseApp{
 				stack.pop();
 				int low = stack.top();
 				stack.pop();
-				int index = partition(nums, low, high);
+				int index = partition(low, high);
 				if (index - 1 > low)
 				{
 					stack.push(low);
@@ -207,6 +218,99 @@ class ofApp : public ofBaseApp{
 			{
 				state = 2;
 				prepareState2();
+			}
+		}
+
+		int partition(int low, int high)
+		{
+			// median of three pivot strategy
+			int mid = low + (high - low) / 2;
+			if (nums[low] > nums[mid])
+			{
+				std::swap(nums[low], nums[mid]);
+			}
+			if (nums[low] > nums[high])
+			{
+				std::swap(nums[low], nums[high]);
+			}
+			if (nums[mid] > nums[high])
+			{
+				std::swap(nums[mid], nums[high]);
+			}
+			std::swap(nums[mid], nums[high]);
+			float pivot = nums[high];
+			int i = low - 1;
+			for (int j = low; j < high; j++)
+			{
+				if (nums[j] <= pivot)
+				{
+					i++;
+					ofSetColor(255, 0, 0);
+					ofDrawLine(i, 1080, i, 1080 - nums[i]);
+					ofDrawLine(j, 1080, j, 1080 - nums[j]);
+					std::swap(nums[i], nums[j]);
+				}
+			}
+			ofSetColor(255, 0, 0);
+			ofDrawLine(i + 1, 1080, i + 1, 1080 - nums[i + 1]);
+			ofDrawLine(high, 1080, high, 1080 - nums[high]);
+			std::swap(nums[i + 1], nums[high]);
+			return i + 1;
+		}
+
+		void passOfMergeSort()
+		{
+			for (int i = 0; i < 1919 - step; i += 2 * step)
+			{
+				int firstStart = i;
+				int firstEnd = i + step - 1;
+				int secondStart = i + step;
+				int secondEnd = std::min(i + 2 * step - 1, 1919 - 1);
+				merge(firstStart, firstEnd, secondStart, secondEnd);
+			}
+			step *= 2;
+			if (step > 1024)
+			{
+				state = 2;
+				prepareState2();
+			}
+		}
+		
+		void merge(int firstStart, int firstEnd, int secondStart, int secondEnd)
+		{
+			std::vector<float> temp;
+			temp.reserve(secondEnd - firstStart + 1);
+			int firstPos = firstStart, secondPos = secondStart;
+
+			while (firstPos <= firstEnd && secondPos <= secondEnd)
+			{
+				if (nums[firstPos] <= nums[secondPos])
+				{
+					temp.push_back(nums[firstPos]);
+					firstPos++;
+				}
+				else
+				{
+					temp.push_back(nums[secondPos]);
+					secondPos++;
+				}
+			}
+
+			while (firstPos <= firstEnd)
+			{
+				temp.push_back(nums[firstPos]);
+				firstPos++;
+			}
+
+			while (secondPos <= secondEnd)
+			{
+				temp.push_back(nums[secondPos]);
+				secondPos++;
+			}
+
+			for (int i = firstStart; i <= secondEnd; i++)
+			{
+				nums[i] = temp[i - firstStart];
 			}
 		}
 

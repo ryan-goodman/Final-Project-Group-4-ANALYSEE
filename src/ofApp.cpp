@@ -13,6 +13,10 @@
 // 7. Mouse being held down over Quick Sort
 // 8. Sort with Quick Sort
 
+// 9. Mouse hovering over Merge Sort
+// 10. Mouse being held down over Merge Sort
+// 11. Sort with Merge Sort
+
 //--------------------------------------------------------------
 // get everything ready when the program begins
 void ofApp::setup()
@@ -84,6 +88,18 @@ void ofApp::draw()
 	{
 		drawState8();
 	}
+	else if (state == 9)
+	{
+		drawState9();
+	}
+	else if (state == 10)
+	{
+		drawState9();
+	}
+	else if (state == 11)
+	{
+		drawState11();
+	}
 }
 
 //--------------------------------------------------------------
@@ -133,11 +149,22 @@ void ofApp::mouseMoved(int x, int y)
 		{
 			state = 6;
 		}
+		else if (mouseWithin(x, y, otherPromptRect.width, otherPromptRect.height / 2, ofGetWidth() * 0.75, 540 - otherPromptRect.height / 4))
+		{
+			state = 9;
+		}
 	}
 	else if (state == 6)
 	{
 		// mouse just left Quick Sort
 		if (!(mouseWithin(x, y, promptRect.width, promptRect.height / 2, ofGetWidth() * 0.25, 540 - promptRect.height / 4)))
+		{
+			state = 5;
+		}
+	}
+	else if (state == 9)
+	{
+		if (!(mouseWithin(x, y, otherPromptRect.width, otherPromptRect.height / 2, ofGetWidth() * 0.75, 540 - otherPromptRect.height / 4)))
 		{
 			state = 5;
 		}
@@ -165,6 +192,11 @@ void ofApp::mousePressed(int x, int y, int button)
 		state = 7;
 		prepareState7();
 	}
+	else if (state == 9)
+	{
+		state = 10;
+		prepareState10();
+	}
 }
 
 //--------------------------------------------------------------
@@ -179,6 +211,11 @@ void ofApp::mouseReleased(int x, int y, int button)
 	{
 		state = 8;
 		prepareState8();
+	}
+	else if (state == 10)
+	{
+		state = 11;
+		prepareState11();
 	}
 }
 
